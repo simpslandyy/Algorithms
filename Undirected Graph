@@ -1,0 +1,155 @@
+/**
+	Name: graph_class.js
+	Dev: Landy Simpson
+	Description: Using an adjacency list to create a graph containing all the provinces/regions/cities/hoods on the website
+
+**/
+
+// Initialize a graph of size V
+function Graph(V) {
+	// The graph itself is an adjacency list of |V| elements
+	this.graph = new Array(V);
+
+	// The length of the graph
+	this.size = this.graph.length; 
+
+	// Keep track of which index is still nullified to make it easier to add new node values
+	this.add_pt = 0;
+
+	// Each element in the graph must have it's own node value, and a list of values adjacent to that value
+	for(var i = 0; i < this.size; i++) {
+		// Each element in the graph has a list of nodes ajacent to it
+		this.graph[i] = {node: null, adjacent: []};
+	}
+
+	// The source of the graph is the first value in the adjacency list
+	this.source = this.graph[0];
+}
+
+
+/*
+	createNode
+		Returns a index into the graph array, and creates a new node 
+		Runtime -> O(1)
+*/
+Graph.prototype.createNode = function(value) { 
+	// index into the graph that has null node value, and sets it's node value to the given value
+	this.graph[this.add_pt].node = value;
+
+	var index = this.add_pt;
+
+	// since we added a value to this index, we shift one over, to the next null index.
+	this.add_pt += 1;
+
+	// returns the index of graph that we just added the new value to
+	return index;
+}
+
+/*
+	addEdge
+		Adds an edge into the graph
+			- start node to the end nodes adjacency list
+			- the end node to the start nodes adjacency list.
+
+		This is slightly different than a normal graph unfornately :(
+		(if both vertices are in the graph, then don't make an edge between them ... a tree like structure)
+		O(1)
+*/
+
+Graph.prototype.addEdge = function(start, end) {
+	var i = this.searchGraph(start);
+	var j = this.searchGraph(end);
+
+	// Both nodes do not exist
+	if(i < 0 && j < 0) {
+		var index1 = this.createNode(start);
+		var index2 = this.createNode(end);
+
+		this.graph[index1].adjacent.push(this.graph[index2].node);
+		this.graph[index2].adjacent.push(this.graph[index1].node);
+	}
+
+	// If both nodes already exist in the tree
+	if(i >= 0 && j >= 0) {
+		this.graph[i].adjacent.push(this.graph[j].node);
+		this.graph[j].adjacent.push(this.graph[i].node);
+	}
+
+	// Start node exists, end node does not exist
+	if(i >= 0 && j < 0){
+		var index = this.createNode(end);
+
+		this.graph[i].adjacent.push(this.graph[index].node);
+		this.graph[index].adjacent.push(this.graph[i].node);
+	}
+
+	// Start node does not exist, end node exists
+	if(i < 0 && j >= 0) {
+		var index = this.createNode(start);
+
+		this.graph[index].adjacent.push(this.graph[j].node);
+		this.graph[j].adjacent.push(this.graph[index].node);
+	}
+}
+
+/*
+	searchGraph
+		Return the index in the graph where value is located, else return -1.
+*/
+Graph.prototype.searchGraph = function(value) {
+
+	// Base case: if the graph is empty, then the value absolutely cannot exist in the graph
+	if(this.source.node == null) {
+		return -1;
+	}
+
+	// change this back tomrrow
+	for(var v = 0; v < this.size; v++) {
+		if(this.graph[v].node == value) {
+			return v;
+		}
+	}
+
+	return -1;
+}
+
+/* 
+	printGraph
+		Prints the entire adjacency list
+*/
+Graph.prototype.printGraph = function() {
+	for(var v = 0; v < this.add_pt; v++) {
+		console.log("Vertex: " + this.graph[v].node + "\n     Adjacent to: " + this.graph[v].adjacent + "\n");
+	}
+}
+
+Graph.prototype.getGraph = function() {
+	return this.graph;
+}
+
+/*
+	getAdjList
+		Returns the adjacency list of the given node, else throws an error
+*/
+Graph.prototype.getAdjList = function(name) {
+	var index = this.searchGraph(name);
+	if(index == -1) {
+		console.error("There is no such node in the graph");
+	} else {
+		return this.graph[index].adjacent;
+
+	}
+
+}
+
+/*
+	getSize
+		Returns the number of nodes in the graph that currently have values
+*/
+Graph.prototype.getNodeCount = function() {
+	return this.add_pt;
+}
+
+
+
+module.exports = Graph;
