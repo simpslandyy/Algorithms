@@ -1,0 +1,69 @@
+function Tree() {
+	this.head = null;
+};
+
+Tree.prototype.hard_copy = function(list) {
+	var cp = [];
+	for(var i = 0; i < list.length; i++) {
+		cp[i] = list[i];
+	}
+
+	return cp;
+} 
+
+Tree.prototype.create_node = function(list, mid) {
+	// Creates a new node object, marking the mid way point of the current list as the root & it's children null.
+	// Edit the string before placing it into the node
+		// It must be all lowercase
+		// All forward slashes and spaces must be replaced with a dash
+	var value = list[mid].name.replace(/\s|\//g, '-').toLowerCase();
+
+	// Make a new node and add the value as the root
+	var new_node = {root: value, left: null, right: null};
+
+	return new_node;
+}
+
+Tree.prototype.build_tree = function(list, len) {
+	if(typeof list == "undefined" || list == null || list.length == 0){
+		return null;
+	};	
+
+	// Find the midway point of the list
+	var mid = Math.floor(len/2);
+
+	// create a new node
+	var node = this.create_node(list, mid);
+
+	// If the head of the tree is null, then set this node as the new head of the tree
+	if (this.head == null || typeof this.head == "undefined") {
+		this.head = node;
+	} 
+
+	// create a hard copy of the list so that we don't directly modify the existing list
+	list_cp = this.hard_copy(list);
+
+	// Remove the element from list we created a node for
+	list_cp.splice(mid, 1);
+
+	// Re-evaluate the length of the list, and the midway point
+	var new_len = list_cp.length;
+	mid = Math.ceil(new_len/2);
+
+	// Cut the list into two equal chunks
+	var right = list_cp;
+	var left = right.splice(0, mid);
+
+	node.left = this.build_tree(left, left.length);
+	node.right = this.build_tree(right, right.length);
+
+	return node;
+}
+
+module.exports = new Tree();
+
+// How to output the entire tree.
+// console.log(JSON.stringify(btree.head, null, 2));
+
+
+
