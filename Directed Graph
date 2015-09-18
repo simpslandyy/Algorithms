@@ -1,0 +1,29 @@
+# A Graph class to create a directed graph. 
+class Graph:
+
+	def __init__(self):
+		self.graph = {}
+
+	# add an edge to the directed graph
+	def addedge(self, pointA, pointB):
+		# If the pointA is not already in the graph, then add it!
+		if pointA not in self.graph:
+			self.graph[pointA] = [pointB]
+			
+		else:
+			# If point A is in the graph, check if pointB is in it's lists of values
+			if pointB not in self.graph[pointA]:
+				self.graph[pointA].append(pointB)
+
+	# if the point exists in the graph, return its adjacency list 
+	def getpoint(self, point):
+		if point in self.graph:
+			return self.graph[point]
+		else:
+			return None
+				
+	# remove an edge from the graph (remove an entire entry from the dictionary)
+	def removeedge(self, pointA):
+		if pointA in self.graph:
+			self.graph.pop(pointA)
+			return self.graph
